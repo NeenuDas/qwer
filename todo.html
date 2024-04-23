@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo App</title>
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>ToDo Project</h2>
+    <div class="container">
+        <div class="addTask">
+            <input type="text" id="taskInput" placeholder="Add a Task">
+            <button id="addTaskButton">Add</button>
+        </div>
+
+        <div class="taskStats">
+            <span id="completionRatio">0 / 0 completed</span>
+        </div>
+
+        <div>
+            <h3>Not Completed</h3>
+            <ul id="notCompletedList"></ul>
+        </div>
+
+        <div>
+            <h3>Completed</h3>
+            <ul id="completedList"></ul>
+        </div>
+    </div>
+
+    <script>
+        const input = document.querySelector('#taskInput');
+        const addButton = document.querySelector('#addTaskButton');
+        const notCompletedList = document.querySelector('#notCompletedList');
+        const completedList = document.querySelector('#completedList');
+        const completionRatio = document.getElementById('completionRatio');
+
+        let totalTasks = 0;
+        let completedTasks = 0;
+
+        function updateCompletionRatio() {
+            completionRatio.textContent = `${completedTasks} / ${totalTasks} completed`;
+        }
+
+        addButton.addEventListener('click', addTask);
+
+        function addTask() {
+            if (input.value.trim() === '') {
+                return;
+            }
+
+            const newLi = document.createElement('li');
+            const checkBtn = document.createElement('button');
+            const editBtn = document.createElement('button');
+            const delBtn = document.createElement('button');
+
+            checkBtn.innerHTML = '<i class="fa fa-square-o"></i>'; 
+            editBtn.innerHTML = '<i class="fa fa-pencil"></i>'; 
+            delBtn.innerHTML = '<i class="fa fa-trash"></i>'; 
+
+            newLi.textContent = input.value.trim();
+            input.value = ''; 
+
+            newLi.appendChild(checkBtn);
+            newLi.appendChild(editBtn);
+            newLi.appendChild(delBtn);
+
+            notCompletedList.appendChild(newLi); 
+
+            totalTasks++; 
+            updateCompletionRatio();
+
+            checkBtn.addEventListener('click', () => {
+                checkBtn.innerHTML = '<i class="fa fa-check-square-o"></i>';
+                completedList.appendChild(newLi);
+                completedTasks++; 
+                updateCompletionRatio(); 
+                checkBtn.style.visibility = 'hidden'; 
+            });
+
+            editBtn.addEventListener('click', () => {
+                const currentText = newLi.textContent.trim();
+                const editInput = document.createElement('input');
+                editInput.type = 'text';
+                editInput.value = currentText;
+
+                newLi.replaceChild(editInput, newLi.firstChild); 
+                editInput.focus();
+
+                editInput.addEventListener('blur', () => {
+                    const updatedText = editInput.value.trim();
+                    if (updatedText === '') {
+                        delBtn.click(); 
+                    } else {
+                        newLi.replaceChild(document.createTextNode(updatedText), editInput);
+                    }
+                });
+            });
+
+            delBtn.addEventListener('click', () => {
+                if (completedList.contains(newLi)) {
+                    completedTasks--; 
+                }
+
+                totalTasks--; 
+                newLi.remove(); 
+
+                updateCompletionRatio(); 
+            });
+        }
+    </script>
+</body>
+</html>
+
+
